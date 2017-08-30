@@ -1,14 +1,16 @@
-import { Logger } from 'ngx-base';
-import { Fabric8AppGeneratorClient } from './fabric8-app-generator.client';
-import { Fabric8AppGeneratorService } from './fabric8-app-generator.service';
-import { CodebasesService } from '../../space/create/codebases/services/codebases.service';
-import { Broadcaster, Notifications } from 'ngx-base';
-import { cloneDeep } from 'lodash';
-import { Space, SpaceAttributes } from 'ngx-fabric8-wit';
-import { Observable } from 'rxjs';
-const Pact = require('pact-web');
+import {Fabric8AppGeneratorClient} from './fabric8-app-generator.client';
+import {Fabric8AppGeneratorService} from './fabric8-app-generator.service';
+import {CodebasesService} from '../../space/create/codebases/services/codebases.service';
+import {cloneDeep} from 'lodash';
+import {Space, SpaceAttributes} from 'ngx-fabric8-wit';
+import {Observable} from 'rxjs';
+import {
+  importWizardStep1_GitOrganisation_Validate,
+  validate_Response,
+  importWizardStep3_Jenkins_Validate
+} from './fabric8-app-generator.client.mock';
 
-import { importWizardStep1_GitOrganisation_Validate, validate_Response, importWizardStep3_Jenkins_Validate } from './fabric8-app-generator.client.mock';
+const Pact = require('pact-web');
 
 describe('Fabric8AppGeneratorClient:', () => {
   let mockAppGeneratorService: any;
@@ -19,17 +21,10 @@ describe('Fabric8AppGeneratorClient:', () => {
   let mockLog: any;
   let fabric8AppGeneratorClient: Fabric8AppGeneratorClient;
   let space = {} as Space;
-  let provider = Pact({ consumer: 'Karma Jasmine', provider: 'Hello', web: true });
+  let provider;
 
-  beforeEach(() => {
-    mockAppGeneratorService = jasmine.createSpyObj('Fabric8AppGeneratorService', ['getFields']);
-    mockCodebasesService = jasmine.createSpyObj('CodebasesService', ['addCodebase']);
-    mockAppGeneratorConfigurationService = {};
-    mockNotification = jasmine.createSpy('Notifications');
-    mockBroadcaster = jasmine.createSpyObj('Broadcaster', ['broadcast']);
-    mockLog = jasmine.createSpyObj('Logger', ['createLoggerDelegate']);
-
-
+  beforeAll(done => {
+    provider = Pact({consumer: 'Karma Jasmine', provider: 'Hello', web: true});
     provider.addInteraction({
       state: 'It works',
       uponReceiving: 'a request for forge',
@@ -40,9 +35,29 @@ describe('Fabric8AppGeneratorClient:', () => {
       willRespondWith: {
         status: 200
       }
-    }).catch(reason => {
-      console.log('Error: ', reason);
+    }).then(() => {
+        done();
+      },
+        err => {
+      done.fail(err);
     });
+  });
+
+  afterAll(done => {
+    provider.finalize().then(() => {
+      done();
+      }, err => {
+      done.fail(err);
+    });
+  });
+
+  beforeEach(() => {
+    mockAppGeneratorService = jasmine.createSpyObj('Fabric8AppGeneratorService', ['getFields']);
+    mockCodebasesService = jasmine.createSpyObj('CodebasesService', ['addCodebase']);
+    mockAppGeneratorConfigurationService = {};
+    mockNotification = jasmine.createSpy('Notifications');
+    mockBroadcaster = jasmine.createSpyObj('Broadcaster', ['broadcast']);
+    mockLog = jasmine.createSpyObj('Logger', ['createLoggerDelegate']);
 
 
     space.name = 'corinne';
@@ -51,7 +66,7 @@ describe('Fabric8AppGeneratorClient:', () => {
     space.attributes.name = space.name;
     space.type = 'spaces';
     space.privateSpace = false;
-    space.process = { name: 'scrum', description: 'full chaos' };
+    space.process = {name: 'scrum', description: 'full chaos'};
     space.relationships = {
       areas: {
         links: {
@@ -74,7 +89,8 @@ describe('Fabric8AppGeneratorClient:', () => {
 
   fit('Add codebase delegate and run it', () => {
     // given
-    const log = () => { };
+    const log = () => {
+    };
     const codebaseReturned = {
       "attributes": {
         "createdAt": "2017-06-22T15:18:03.580005Z",
@@ -102,7 +118,9 @@ describe('Fabric8AppGeneratorClient:', () => {
       "type": "codebases"
     };
     mockLog.createLoggerDelegate.and.returnValue(log);
-    fabric8AppGeneratorClient = new Fabric8AppGeneratorClient(mockAppGeneratorService, mockCodebasesService, mockAppGeneratorConfigurationService, mockNotification, mockBroadcaster, mockLog);
+    fabric8AppGeneratorClient =
+      new Fabric8AppGeneratorClient(mockAppGeneratorService, mockCodebasesService, mockAppGeneratorConfigurationService,
+        mockNotification, mockBroadcaster, mockLog);
     mockAppGeneratorConfigurationService.currentSpace = space;
     mockCodebasesService.addCodebase.and.returnValue(Observable.of(codebaseReturned))
     fabric8AppGeneratorClient.result = {
@@ -119,10 +137,10 @@ describe('Fabric8AppGeneratorClient:', () => {
     // when
     let delegate = fabric8AppGeneratorClient.getAddCodebaseDelegate();
     delegate().then(result => {
-      // then
-      expect(result.codebase.attributes.stackId).toEqual("vert.x");
-      expect(result.codebase.attributes.url).toEqual("https://github.com/corinnekrych/corinne-test-githubqqq.git");
-    },
+        // then
+        expect(result.codebase.attributes.stackId).toEqual("vert.x");
+        expect(result.codebase.attributes.url).toEqual("https://github.com/corinnekrych/corinne-test-githubqqq.git");
+      },
       err => {
         fail("AddCodebaseDelegate fails" + err);
       })
@@ -131,7 +149,8 @@ describe('Fabric8AppGeneratorClient:', () => {
 
   it('Add multiple codebases', () => {
     // given
-    const log = () => { };
+    const log = () => {
+    };
     const codebaseReturned = {
       "attributes": {
         "createdAt": "2017-06-22T15:18:03.580005Z",
@@ -158,7 +177,9 @@ describe('Fabric8AppGeneratorClient:', () => {
       "type": "codebases"
     };
     mockLog.createLoggerDelegate.and.returnValue(log);
-    fabric8AppGeneratorClient = new Fabric8AppGeneratorClient(mockAppGeneratorService, mockCodebasesService, mockAppGeneratorConfigurationService, mockNotification, mockBroadcaster, mockLog);
+    fabric8AppGeneratorClient =
+      new Fabric8AppGeneratorClient(mockAppGeneratorService, mockCodebasesService, mockAppGeneratorConfigurationService,
+        mockNotification, mockBroadcaster, mockLog);
     mockAppGeneratorConfigurationService.currentSpace = space;
     mockCodebasesService.addCodebase.and.returnValue(Observable.of(codebaseReturned))
     fabric8AppGeneratorClient.result = {
@@ -177,9 +198,9 @@ describe('Fabric8AppGeneratorClient:', () => {
     // when
     let delegate = fabric8AppGeneratorClient.getAddCodebaseDelegate();
     delegate().then(result => {
-      // then
-      expect(result.codebase.attributes.url).toEqual("https://github.com/corinnekrych/corinne-test-githubqqq.git");
-    },
+        // then
+        expect(result.codebase.attributes.url).toEqual("https://github.com/corinnekrych/corinne-test-githubqqq.git");
+      },
       err => {
         fail("AddCodebaseDelegate fails" + err);
       })
@@ -188,13 +209,16 @@ describe('Fabric8AppGeneratorClient:', () => {
 
   it('Validate successfully called on first step of import repository wizard', (done) => {
     // given
-    mockLog.createLoggerDelegate.and.returnValue(() => { });
+    mockLog.createLoggerDelegate.and.returnValue(() => {
+    });
     mockAppGeneratorService.getFields.and.returnValue(Observable.of(validate_Response));
-    fabric8AppGeneratorClient = new Fabric8AppGeneratorClient(mockAppGeneratorService, mockCodebasesService, mockAppGeneratorConfigurationService, mockNotification, mockBroadcaster, mockLog);
+    fabric8AppGeneratorClient =
+      new Fabric8AppGeneratorClient(mockAppGeneratorService, mockCodebasesService, mockAppGeneratorConfigurationService,
+        mockNotification, mockBroadcaster, mockLog);
     fabric8AppGeneratorClient._currentResponse = importWizardStep1_GitOrganisation_Validate;
 
     // when
-    fabric8AppGeneratorClient.validate({ showProcessingIndicator: true }).then(() => {
+    fabric8AppGeneratorClient.validate({showProcessingIndicator: true}).then(() => {
       // then
       // no new fields added as this is the first validation call
       expect(fabric8AppGeneratorClient._currentResponse.context.validationCommand.parameters.fields.length)
@@ -210,13 +234,16 @@ describe('Fabric8AppGeneratorClient:', () => {
   // Each validation should send all the fields since the beginning of the wizard flow.
   it('Validate successfully called on last step of import repository wizard', (done) => {
     // given
-    mockLog.createLoggerDelegate.and.returnValue(() => { });
+    mockLog.createLoggerDelegate.and.returnValue(() => {
+    });
     mockAppGeneratorService.getFields.and.returnValue(Observable.of(validate_Response));
-    fabric8AppGeneratorClient = new Fabric8AppGeneratorClient(mockAppGeneratorService, mockCodebasesService, mockAppGeneratorConfigurationService, mockNotification, mockBroadcaster, mockLog);
+    fabric8AppGeneratorClient =
+      new Fabric8AppGeneratorClient(mockAppGeneratorService, mockCodebasesService, mockAppGeneratorConfigurationService,
+        mockNotification, mockBroadcaster, mockLog);
     fabric8AppGeneratorClient._currentResponse = cloneDeep(importWizardStep3_Jenkins_Validate);
 
     // when
-    fabric8AppGeneratorClient.validate({ showProcessingIndicator: true }).then(() => {
+    fabric8AppGeneratorClient.validate({showProcessingIndicator: true}).then(() => {
       // then
       // no new fields added as this is the first validation call
       expect(fabric8AppGeneratorClient._currentResponse.context.validationCommand.parameters.fields.length)
@@ -231,7 +258,8 @@ describe('Fabric8AppGeneratorClient:', () => {
 
   it('Format the returned result from Forge', () => {
     // given
-    mockLog.createLoggerDelegate.and.returnValue(() => { });
+    mockLog.createLoggerDelegate.and.returnValue(() => {
+    });
     let result = {
       "namespace": null,
       "buildConfigName": "",
@@ -245,7 +273,9 @@ describe('Fabric8AppGeneratorClient:', () => {
       "gitOwnerName": "corinnekrych",
       "warnings": []
     };
-    fabric8AppGeneratorClient = new Fabric8AppGeneratorClient(mockAppGeneratorService, mockCodebasesService, mockAppGeneratorConfigurationService, mockNotification, mockBroadcaster, mockLog);
+    fabric8AppGeneratorClient =
+      new Fabric8AppGeneratorClient(mockAppGeneratorService, mockCodebasesService, mockAppGeneratorConfigurationService,
+        mockNotification, mockBroadcaster, mockLog);
 
     // when
     let msg = fabric8AppGeneratorClient.formatForDisplay(result);
