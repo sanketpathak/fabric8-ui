@@ -6,6 +6,8 @@ import { Broadcaster, Notifications } from 'ngx-base';
 import { cloneDeep } from 'lodash';
 import { Space, SpaceAttributes } from 'ngx-fabric8-wit';
 import { Observable } from 'rxjs';
+const Pact = require('pact-web');
+
 import { importWizardStep1_GitOrganisation_Validate, validate_Response, importWizardStep3_Jenkins_Validate } from './fabric8-app-generator.client.mock';
 
 describe('Fabric8AppGeneratorClient:', () => {
@@ -17,6 +19,7 @@ describe('Fabric8AppGeneratorClient:', () => {
   let mockLog: any;
   let fabric8AppGeneratorClient: Fabric8AppGeneratorClient;
   let space = {} as Space;
+  let provider = Pact({ consumer: 'Karma Jasmine', provider: 'Hello', web: true });
 
   beforeEach(() => {
     mockAppGeneratorService = jasmine.createSpyObj('Fabric8AppGeneratorService', ['getFields']);
@@ -25,6 +28,22 @@ describe('Fabric8AppGeneratorClient:', () => {
     mockNotification = jasmine.createSpy('Notifications');
     mockBroadcaster = jasmine.createSpyObj('Broadcaster', ['broadcast']);
     mockLog = jasmine.createSpyObj('Logger', ['createLoggerDelegate']);
+
+
+    provider.addInteraction({
+      state: 'It works',
+      uponReceiving: 'a request for forge',
+      withRequest: {
+        method: 'GET',
+        path: 'api/version'
+      },
+      willRespondWith: {
+        status: 200
+      }
+    }).catch(reason => {
+      console.log('Error: ', reason);
+    });
+
 
     space.name = 'corinne';
     space.path = '/path/to/corinne';
@@ -53,7 +72,7 @@ describe('Fabric8AppGeneratorClient:', () => {
     };
   });
 
-  it('Add codebase delegate and run it', () => {
+  fit('Add codebase delegate and run it', () => {
     // given
     const log = () => { };
     const codebaseReturned = {
