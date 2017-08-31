@@ -156,7 +156,7 @@ export class Fabric8ForgeService extends ForgeService {
     }
   }
 
-  public GetCommand(url: string): Observable<IForgeCommandResponse> {
+  GetCommand(url: string): Observable<IForgeCommandResponse> {
     return Observable.create((observer: Observer<IForgeCommandResponse>) => {
       let headers = new Headers();
       this.addAuthorizationHeaders(headers);
@@ -191,7 +191,7 @@ export class Fabric8ForgeService extends ForgeService {
     });
   }
 
-  private PostCommand(url: string, body: any): Observable<IForgeCommandResponse> {
+  PostCommand(url: string, body: any): Observable<IForgeCommandResponse> {
     return Observable.create((observer: Observer<IForgeCommandResponse>) => {
       this.log(`Forge POST request  : ${url}`, body);
       let headers = new Headers({ 'Content-Type': 'application/json' });
