@@ -64,7 +64,7 @@ describe('Forge API tests:', () => {
     fabric8ForgeService = TestBed.get(Fabric8ForgeService);
   });
 
-  it('Step1 - init - import wizard: GET command successfully', () => {
+  fit('Step1 - init - import wizard: GET command successfully', done => {
     // given
     const log = () => { };
     mockLog.createLoggerDelegate.and.returnValue(log);
@@ -76,6 +76,7 @@ describe('Forge API tests:', () => {
       // then
       console.log('2');
       expect(data.payload.data).toEqual('boo');
+      done();
     });
 
   });
