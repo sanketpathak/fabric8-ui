@@ -14,11 +14,11 @@ import {AuthenticationService} from "ngx-login-client";
 import {ApiLocatorService} from "../../../shared/api-locator.service";
 
 describe('Forge API tests:', () => {
-  let provider: any;
   let mockLog: any;
   let fabric8ForgeService: Fabric8ForgeService;
   let mockAuthService: any;
   let mockApiLocatorService: any;
+  let provider = Pact({ consumer: 'AppGeneratorWizard', provider: 'ForgeGenerator', web: true });
 
   afterAll(done => {
     provider.finalize()
@@ -52,7 +52,6 @@ describe('Forge API tests:', () => {
 
   it('Step_1_1 - init - import wizard: GET command successfully', done => {
     // given
-    provider = Pact({ consumer: 'AppGeneratorWizardStep1.1', provider: 'ForgeGenerator', web: true });
     provider.addInteraction({
       state: 'step1.1.init',
       uponReceiving: 'step1.1',
@@ -86,7 +85,6 @@ describe('Forge API tests:', () => {
 
   it('Step_1_2 - validate - import wizard: POST command successfully', done => {
     // given
-    provider = Pact({ consumer: 'AppGeneratorWizardStep1.2', provider: 'ForgeGenerator', web: true });
     provider.addInteraction({
       state: 'step1.2.validate',
       uponReceiving: 'step1.2',
@@ -121,7 +119,6 @@ describe('Forge API tests:', () => {
 
   it('Step_1_3 - next - import wizard: POST command successfully', done => {
     // given
-    provider = Pact({ consumer: 'AppGeneratorWizardStep1.3', provider: 'ForgeGenerator', web: true });
     provider.addInteraction({
       state: 'step1.3.next',
       uponReceiving: 'step1.3',
