@@ -35,7 +35,7 @@ describe('Forge API tests:', () => {
   });
 
   afterAll(done => {
-    provider.writePact()
+    provider.finalize()
       .then(function() { done(); }, function(err) { console.log('failed'); done.fail(err); });
   });
 
