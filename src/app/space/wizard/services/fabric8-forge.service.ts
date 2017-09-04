@@ -98,7 +98,7 @@ export class Fabric8ForgeService extends ForgeService {
               messages: body.messages
             }
           };
-        } else if (body.cause.type == "io.fabric8.forge.generator.keycloak.KeyCloakFailureException") {
+        } else if (body.cause.type == 'io.fabric8.forge.generator.keycloak.KeyCloakFailureException') {
           errorName = 'AuthenticationError';
           errorMessage = body.cause.type;
           innerError = {
@@ -148,14 +148,6 @@ export class Fabric8ForgeService extends ForgeService {
     });
 
   }
-
-  private addAuthorizationHeaders(headers: Headers) {
-    if (this._authService.isLoggedIn()) {
-      let token = this._authService.getToken();
-      headers.set('Authorization', `Bearer ${token}`);
-    }
-  }
-
   GetCommand(url: string): Observable<IForgeCommandResponse> {
     return Observable.create((observer: Observer<IForgeCommandResponse>) => {
       let headers = new Headers();
@@ -163,9 +155,9 @@ export class Fabric8ForgeService extends ForgeService {
       if (!headers.get('Authorization')) {
         let error = {
           origin: this.constructor.name,
-          name: "Authentication error",
-          message: "Please login to be able to add to space."
-        }
+          name: 'Authentication error',
+          message: 'Please login to be able to add to space.'
+        };
         return observer.error(error);
       } else {
         let options = new RequestOptions(<RequestOptionsArgs>{ headers: headers });
@@ -187,7 +179,7 @@ export class Fabric8ForgeService extends ForgeService {
           }, (err) => {
             return observer.error(err);
           });
-      };
+      }
     });
   }
 
@@ -195,13 +187,13 @@ export class Fabric8ForgeService extends ForgeService {
     return Observable.create((observer: Observer<IForgeCommandResponse>) => {
       this.log(`Forge POST request  : ${url}`, body);
       let headers = new Headers({ 'Content-Type': 'application/json' });
-      this.addAuthorizationHeaders(headers)
+      this.addAuthorizationHeaders(headers);
       if (!headers.get('Authorization')) {
         let error = {
           origin: this.constructor.name,
-          name: "Authentication error",
-          message: "Please login to be able to add to space."
-        }
+          name: 'Authentication error',
+          message: 'Please login to be able to add to space.'
+        };
         return observer.error(error);
       } else {
         let options = new RequestOptions(<RequestOptionsArgs>{ headers: headers });
@@ -251,7 +243,13 @@ export class Fabric8ForgeService extends ForgeService {
           }));
       }
     });
+  }
 
+  private addAuthorizationHeaders(headers: Headers) {
+    if (this._authService.isLoggedIn()) {
+      let token = this._authService.getToken();
+      headers.set('Authorization', `Bearer ${token}`);
+    }
   }
 
   private forgeHttpCommandRequest(commandRequest: IForgeCommandRequest): Observable<IForgeCommandResponse> {
