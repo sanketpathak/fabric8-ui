@@ -19,6 +19,10 @@ import {step_3_1_input} from './import-wizard/step_3_1_input';
 import {step_3_1_output} from 'tests/forge-api/import-wizard/step_3_1_output';
 import {step_3_2_output} from './import-wizard/step_3_2_output';
 import {step_3_2_input} from './import-wizard/step_3_2_input';
+import {step_4_1_output} from './import-wizard/step_4_1_output';
+import {step_4_1_input} from './import-wizard/step_4_1_input';
+import {step_4_2_output} from './import-wizard/step_4_2_output';
+import {step_4_2_input} from './import-wizard/step_4_2_input';
 
 describe('Forge API tests:', () => {
   let mockLog: any;
@@ -360,10 +364,79 @@ describe('Forge API tests:', () => {
       console.log('failed');
       done.fail(err);
     });
-
-    // TODO step4
   });
 
-})
-;
+  it('Step_4_1 - import wizard: validate select jenkins and github hook', done => {
+    // given
+    provider.addInteraction({
+      state: 'step4.1.validate',
+      uponReceiving: 'step4.1',
+      withRequest: {
+        method: 'POST',
+        path: '/forge/commands/fabric8-import-git/validate',
+        body: step_4_1_input
+      },
+      willRespondWith: {
+        status: 200,
+        headers: {'Content-Type': 'application/json'},
+        body: step_4_1_output
+      }
+    }).then(() => {
+      // when
+      fabric8ForgeService.PostCommand(stubForgeUrl + 'fabric8-import-git/validate', step_4_1_input)
+        .subscribe((data: any) => {
+          // then
+          const response = data.payload.data;
+          expect(response.state.valid).toEqual(true);
+          expect(response.state.canMoveToNextStep).toEqual(false);
+          expect(response.state.canMoveToPreviousStep).toEqual(true);
+          expect(response.state.steps).toContain('io.fabric8.forge.generator.github.GithubImportPickOrganisationStep');
+          expect(response.state.steps).toContain('io.fabric8.forge.generator.github.GithubImportPickRepositoriesStep');
+          expect(response.state.steps).toContain('Obsidian: Configure Pipeline');
+          expect(response.state.steps).toContain('io.fabric8.forge.generator.kubernetes.CreateBuildConfigStep');
+          expect(response.messages.length).toEqual(0);
+          done();
+        });
+    }, function (err) {
+      console.log('failed');
+      done.fail(err);
+    });
+  });
 
+  it('Step_4_2 - import wizard: next select jenkins and github hook', done => {
+    // given
+    provider.addInteraction({
+      state: 'step4.2.next',
+      uponReceiving: 'step4.2',
+      withRequest: {
+        method: 'POST',
+        path: '/forge/commands/fabric8-import-git/next',
+        body: step_4_2_input
+      },
+      willRespondWith: {
+        status: 200,
+        headers: {'Content-Type': 'application/json'},
+        body: step_4_2_output
+      }
+    }).then(() => {
+      // when
+      fabric8ForgeService.PostCommand(stubForgeUrl + 'fabric8-import-git/next', step_4_2_input)
+        .subscribe((data: any) => {
+          // then
+          const response = data.payload.data.results;
+          expect(response[4]).toEqual({warnings: []});
+          expect(response[6].namespace).toEqual('ckrych');
+          expect(response[6].gitRepositories.length).toEqual(2);
+          expect(response[6].gitRepositories[0].url).toEqual('https://github.com/corinnekrych/sprint135.git');
+          expect(response[6].gitRepositories[0].repoName).toEqual('sprint135');
+          expect(response[6].gitRepositories[1].url).toEqual('https://github.com/corinnekrych/sprint135bis.git');
+          expect(response[6].gitRepositories[1].repoName).toEqual('sprint135bis');
+          expect(response[6].cheStackId).toEqual('vert.x');
+          done();
+        });
+    }, function (err) {
+      console.log('failed');
+      done.fail(err);
+    });
+  });
+});
