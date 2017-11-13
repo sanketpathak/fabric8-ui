@@ -1,4 +1,4 @@
-@Library('github.com/jstrachan/fabric8-pipeline-library@uifix')
+@Library('github.com/jstrachan/fabric8-pipeline-library@ui-preprod-fix')
 def utils = new io.fabric8.Utils()
 def flow = new io.fabric8.Fabric8Commands()
 def project = 'fabric8-ui/fabric8-ui'
