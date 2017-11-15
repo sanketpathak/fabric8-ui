@@ -85,5 +85,11 @@ if (ciDeploy){
                 }
            }
        }
+       stage('e2e test'){
+         fabric8EETest userSecret: "default-test-user", beforeTest: fabric8EETestFindLocal() + """
+export TARGET_URL="https://${route}"
+export DISABLE_CHE="true"
+"""
+       }
    }
 }
