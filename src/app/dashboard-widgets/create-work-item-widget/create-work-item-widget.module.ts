@@ -14,6 +14,7 @@ import { CreateWorkItemWidgetComponent } from './create-work-item-widget.compone
   imports: [
     RouterModule,
     CommonModule,
+    CreateWorkItemOverlayModule,
     FeatureFlagModule,
     FormsModule,
     WidgetsModule,
