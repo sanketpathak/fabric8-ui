@@ -29,8 +29,7 @@ export class FeatureFooterComponent implements OnInit, OnDestroy, OnChanges {
 
   constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   ngOnChanges() {
     if (this.featurePageConfig) {
