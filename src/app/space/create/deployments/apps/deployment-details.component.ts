@@ -357,4 +357,14 @@ export class DeploymentDetailsComponent {
     return Math.max(largestUsage, largestQuota);
   }
 
+  private getNetStatValue(stat: NetworkStat): { sent: number, received: number } {
+    let sent: number = stat.sent.used;
+    let received: number = stat.received.used;
+    if ((stat.received instanceof ScaledNetStat) && (stat.sent instanceof ScaledNetStat)) {
+      sent = stat.sent.raw;
+      received = stat.received.raw;
+    }
+    return { sent, received };
+  }
+
 }
