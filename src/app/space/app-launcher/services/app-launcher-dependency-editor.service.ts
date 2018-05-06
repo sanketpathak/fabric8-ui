@@ -38,10 +38,10 @@ export class AppLauncherDependencyEditorService implements DependencyEditorServi
     }));
   }
 
-  getBoosterInfo(missionId: string, runtimeId: string): Observable<any> {
+  getBoosterInfo(missionId: string, runtimeId: string, runtimeVersion: string): Observable<any> {
     if (missionId && runtimeId) {
       let boosterInfoEndPoint: string = this.END_POINT + this.API_BASE + 'booster';
-      boosterInfoEndPoint += `?mission=${missionId}&runtime=${runtimeId}`;
+      boosterInfoEndPoint += `?mission=${missionId}&runtime=${runtimeId}&runtimeVersion=${runtimeVersion}`;
       return this.options.flatMap((option) => {
         return this.http.get(boosterInfoEndPoint, option)
                     .map(response => response.json() as any)
