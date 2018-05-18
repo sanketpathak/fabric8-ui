@@ -40,6 +40,10 @@ export class AppLauncherDependencyEditorService implements DependencyEditorServi
 
   getBoosterInfo(missionId: string, runtimeId: string, runtimeVersion: string): Observable<any> {
     if (missionId && runtimeId) {
+      debugger;
+      let an_rec_url = process.env['ANALYTICS_RECOMMENDER_URL'] || '';
+      let an_Lic_url = process.env['ANALYTICS_LICENSE_URL'] || '';
+      let an_rec_api_url = process.env['FABRIC8_RECOMMENDER_API_URL'] || '';
       let boosterInfoEndPoint: string = this.END_POINT + this.API_BASE + 'booster';
       boosterInfoEndPoint += `?mission=${missionId}&runtime=${runtimeId}&runtimeVersion=${runtimeVersion}`;
       return this.options.flatMap((option) => {
